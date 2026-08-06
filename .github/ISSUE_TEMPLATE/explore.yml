@@ -1,0 +1,63 @@
+name: Explore
+description: Open a line of enquiry. Every agent session mints one of these; it is the handle that binds a conversation to a durable record.
+title: "explore: "
+labels: ["explore", "status:exploring"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An explore issue is not documentation. It is four things at once:
+        the identifier for a conversation, the record of what was decided,
+        the state another agent needs to pick the thread up, and the notice
+        that stops someone else exploring the same ground.
+
+        Fill the structured block first. Prose goes last, and only for what
+        genuinely does not fit a field — free text cannot be intersected,
+        so anything left in prose is invisible to the tooling.
+
+  - type: textarea
+    id: facts
+    attributes:
+      label: Structured
+      description: >-
+        Machine-read. `areas` is normally written automatically at session
+        end from the files actually touched — leave it empty rather than
+        guessing. `next_move` is what makes this resumable.
+      render: yaml
+      value: |
+        areas: []          # path globs this concerns; auto-filled at session end
+        relates_to: []     # issue / PR / discussion numbers, as #123
+        next_move: ""      # one line: the concrete next step, for whoever resumes
+        decision: ""       # kill | build — set only at resolution
+        because: ""        # required whenever decision is set
+    validations:
+      required: true
+
+  - type: input
+    id: question
+    attributes:
+      label: What are we trying to find out?
+      description: One sentence. If this cannot be stated in one sentence, it is probably two explores.
+      placeholder: Whether the merge gate can distinguish an unavailable verdict from a denied one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: >-
+        Amplifying detail that did not fit a field — reasoning, dead ends,
+        things worth remembering. Optional, and deliberately last.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Closing this out.** An explore ends by setting `decision` to `kill`
+        or `build`, with `because` filled in, and swapping `status:exploring`
+        for `status:killed` or `status:promoted`. A kill with no reason is
+        worse than no record at all — an agent searching later will read the
+        silence as "never considered" and propose it again.
